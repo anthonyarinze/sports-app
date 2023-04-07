@@ -29,6 +29,13 @@
             {
               "client_id": "684565758324-tcb0n7fnvcgu5oe5ti96kcfphk8433dg.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "684565758324-jdl8k08dr6kcs13rc67irk0pec8485f7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.sportsApp"
+              }
             }
           ]
         }
