@@ -1,9 +1,11 @@
 // ignore_for_file: avoid_print, use_build_context_synchronously
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:sports_app/auth/verify_phone.dart';
 
-import '../pages/master.dart';
 import 'login.dart';
 
 class Register extends StatefulWidget {
@@ -17,6 +19,32 @@ class _RegisterState extends State<Register> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+  _sendOTP() async {
+    await _firebaseAuth.verifyPhoneNumber(
+      phoneNumber: "+234${phoneController.text}",
+      verificationCompleted: (PhoneAuthCredential phoneAuthCredential) async {
+        await _firebaseAuth.signInWithCredential(phoneAuthCredential);
+      },
+      verificationFailed: (FirebaseAuthException error) {
+        if (error.code == 'invalid-phone-number') {
+          print("The provided phone number is invalid");
+        }
+      },
+      codeSent: (verificationId, forceResedningToken) {
+        log("Verification ID: $verificationId");
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => VerifyPhone(
+                      verificationId: verificationId,
+                    )));
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {},
+      timeout: const Duration(seconds: 60),
+    );
+  }
 
   @override
   void dispose() {
@@ -105,18 +133,20 @@ class _RegisterState extends State<Register> {
                     width: MediaQuery.of(context).size.width,
                     child: TextButton(
                       onPressed: () async {
-                        await signUpWithEmail(
-                          emailController.text.trim(),
-                          passwordController.text.trim(),
-                        );
-                        await updateUserPhoneNumber(
-                            phoneController.text.trim());
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const Master(),
-                          ),
-                        );
+                        await _sendOTP();
+                        // await signUpWithEmail(
+                        //   emailController.text.trim(),
+                        //   passwordController.text.trim(),
+                        // );
+                        // await updateUserPhoneNumber(
+                        //   phoneController.text.trim(),
+                        // );
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => const Master(),
+                        //   ),
+                        // );
                       },
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all(

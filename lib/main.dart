@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:sports_app/auth/verify_phone.dart';
 import 'package:sports_app/firebase_options.dart';
+import 'package:sports_app/pages/interests.dart';
 
 Future<void> main() async {
   //Initialize firebase
@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const VerifyPhone(),
+      home: const SafeArea(child: Interests()),
     );
   }
 }
