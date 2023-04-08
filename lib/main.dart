@@ -22,7 +22,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const SafeArea(child: Interests()),
+      home: const SafeArea(
+        child: Interests(),
+      ),
     );
   }
 }
