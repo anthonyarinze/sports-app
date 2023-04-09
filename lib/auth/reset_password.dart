@@ -48,7 +48,7 @@ class ResetPasswordState extends State<ResetPassword> {
                   ),
                 ),
                 const Padding(
-                  padding: EdgeInsets.fromLTRB(20, 12, 20, 0),
+                  padding: EdgeInsets.fromLTRB(30, 12, 20, 0),
                   child: Text(
                     "Enter the email associated with your account "
                     "and we'll send an email with instructions to reset your password",
@@ -93,19 +93,29 @@ class ResetPasswordState extends State<ResetPassword> {
                   onPressed: () async {
                     showDialog(
                       context: context,
-                      barrierDismissible: false,
+                      barrierDismissible: true,
                       builder: (context) => const Center(
                         child: CircularProgressIndicator(),
                       ),
                     );
-                    await _auth.sendPasswordResetEmail(email: email);
-                    // ignore: use_build_context_synchronously
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ResetComplete(),
-                      ),
-                    );
+                    try {
+                      await _auth.sendPasswordResetEmail(email: email);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ResetComplete(),
+                        ),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            e.toString(),
+                          ),
+                        ),
+                      );
+                      Navigator.pop(context);
+                    }
                   },
                   child: Container(
                     height: 70,

@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:sports_app/pages/master.dart';
 
 class Interests extends StatefulWidget {
   const Interests({super.key});
@@ -9,6 +12,16 @@ class Interests extends StatefulWidget {
 
 class _InterestsState extends State<Interests> {
   bool isChecked = false;
+  Map<String, bool?> myMap = {
+    "Football": false,
+    "Basketball": false,
+    "Ice Hockey": false,
+    "Motorsports": false,
+    "Bandy": false,
+    "Rugby": false,
+    "Skiing": false,
+    "Shooting": false,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +48,63 @@ class _InterestsState extends State<Interests> {
                 style: TextStyle(fontSize: 20, color: Colors.grey),
               ),
             ),
-            buildInterestWidget(
-              isChecked: isChecked,
-              onChanged: (value) {},
+            const SizedBox(height: 20.0),
+            GridView.count(
+              shrinkWrap: true,
+              crossAxisCount: 2,
+              crossAxisSpacing: 20.0,
+              mainAxisSpacing: 20.0,
+              childAspectRatio: 2.5,
+              padding: const EdgeInsets.all(10.0),
+              children: List.generate(myMap.length, (index) {
+                final topic = myMap.keys.elementAt(index);
+                var isCheckedAtIndex = myMap.values.elementAt(index);
+                return buildInterestWidget(
+                  isChecked: isCheckedAtIndex,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      isCheckedAtIndex = !(isCheckedAtIndex ?? false);
+                      myMap[topic] = isCheckedAtIndex;
+                      log(isCheckedAtIndex.toString());
+                      log(topic);
+                    });
+                  },
+                  topic: topic,
+                );
+              }),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 30.0),
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width / 1.05,
+                height: 56,
+                child: TextButton(
+                  onPressed: () async {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const Master()));
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(
+                      const Color(0xFF26005f),
+                    ),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                  ),
+                  child: const Text(
+                    "Continue",
+                    style: TextStyle(
+                      fontSize: 25,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -51,10 +118,12 @@ class buildInterestWidget extends StatelessWidget {
     super.key,
     required this.isChecked,
     required this.onChanged,
+    required this.topic,
   });
 
-  final bool isChecked;
-  final ValueSetter<bool?> onChanged;
+  final bool? isChecked;
+  final ValueSetter<bool> onChanged;
+  final String topic;
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +132,8 @@ class buildInterestWidget extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(color: Colors.black54),
-          borderRadius: BorderRadius.circular(7),
+          borderRadius: BorderRadius.circular(19),
+          color: isChecked! ? const Color(0xFF26005f) : Colors.transparent,
         ),
         child: Row(
           children: [
@@ -73,13 +143,15 @@ class buildInterestWidget extends StatelessWidget {
               activeColor: Colors.black,
               fillColor: MaterialStateProperty.all(Colors.black),
               value: isChecked,
-              onChanged: onChanged,
+              onChanged: (value) {
+                onChanged(!isChecked!);
+              },
             ),
-            const Text(
-              "Football",
+            Text(
+              topic,
               style: TextStyle(
-                fontSize: 20,
-              ),
+                  fontSize: 20,
+                  color: isChecked! ? Colors.white : Colors.black),
             ),
           ],
         ),

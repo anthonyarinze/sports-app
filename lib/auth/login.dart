@@ -124,7 +124,7 @@ class _LoginState extends State<Login> {
                   child: Row(
                     children: [
                       Text(
-                        "New to Aquaponics?",
+                        "New around here?",
                         style: TextStyle(
                           color: Colors.grey.shade700,
                           fontSize: 16,
