@@ -1,7 +1,9 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:sports_app/pages/master.dart';
+import 'package:sports_app/auth/verify_email.dart';
 
 class VerifyPhone extends StatefulWidget {
   final String verificationId;
@@ -20,17 +22,31 @@ class _VerifyPhoneState extends State<VerifyPhone> {
   String currentText = "";
 
   _verifyOTP() async {
+    String? email = _firebaseAuth.currentUser!.email;
+
     PhoneAuthCredential credential = PhoneAuthProvider.credential(
       verificationId: verificationId,
       smsCode: currentText,
     );
-    await _firebaseAuth.signInWithCredential(credential).then((value) => {
-          if (value.user != null)
-            {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Master()))
-            }
-        });
+    try {
+      UserCredential userCredential =
+          await _firebaseAuth.currentUser!.linkWithCredential(credential);
+      await userCredential.user!.updatePhoneNumber(credential);
+      await _firebaseAuth.currentUser!.reload();
+      // await _firebaseAuth.currentUser!.linkWithCredential()
+      await _firebaseAuth.signInWithCredential(credential).then((value) => {
+            if (value.user != null)
+              {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const VerifyEmail()))
+              }
+          });
+      log("Updated phone number");
+    } catch (e) {
+      log(e.toString());
+    }
   }
 
   @override

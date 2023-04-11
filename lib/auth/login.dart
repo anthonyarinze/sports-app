@@ -91,7 +91,7 @@ class _LoginState extends State<Login> {
                     height: 56,
                     child: TextButton(
                       onPressed: () async {
-                        signin();
+                        await signin();
                       },
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all(

@@ -20,6 +20,7 @@ class _RegisterState extends State<Register> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  String currentText = "";
 
   _sendOTP() async {
     await _firebaseAuth.verifyPhoneNumber(
@@ -32,8 +33,19 @@ class _RegisterState extends State<Register> {
           print("The provided phone number is invalid");
         }
       },
-      codeSent: (verificationId, forceResedningToken) {
+      codeSent: (verificationId, forceResedningToken) async {
         log("Verification ID: $verificationId");
+
+        if (_firebaseAuth.currentUser != null &&
+            !_firebaseAuth.currentUser!.emailVerified) {
+          try {
+            await _firebaseAuth.currentUser!.sendEmailVerification();
+            print(
+                'A verification email has been sent to ${_firebaseAuth.currentUser!.email}.');
+          } catch (e) {
+            print('An error occurred while sending the verification email: $e');
+          }
+        }
         Navigator.push(
             context,
             MaterialPageRoute(
@@ -134,19 +146,11 @@ class _RegisterState extends State<Register> {
                     child: TextButton(
                       onPressed: () async {
                         await _sendOTP();
-                        // await signUpWithEmail(
-                        //   emailController.text.trim(),
-                        //   passwordController.text.trim(),
-                        // );
-                        // await updateUserPhoneNumber(
-                        //   phoneController.text.trim(),
-                        // );
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) => const Master(),
-                        //   ),
-                        // );
+                        await signUpWithEmail(
+                          emailController.text.trim(),
+                          passwordController.text.trim(),
+                        );
+                        log("Current phone: ${_firebaseAuth.currentUser!.phoneNumber}");
                       },
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all(
@@ -227,13 +231,6 @@ Future<UserCredential> signUpWithEmail(String email, String password) async {
     print(e.toString());
     rethrow;
   }
-}
-
-Future<void> updateUserPhoneNumber(String phoneNumber) async {
-  final user = FirebaseAuth.instance.currentUser;
-  final credential = PhoneAuthProvider.credential(
-      verificationId: user!.uid, smsCode: phoneNumber);
-  await user.updatePhoneNumber(credential);
 }
 
 //Input Fields

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -10,6 +12,7 @@ class VerifyEmail extends StatefulWidget {
 
 class _VerifyEmailState extends State<VerifyEmail> {
   bool _isVerifying = false;
+  final user = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -113,12 +116,21 @@ class _VerifyEmailState extends State<VerifyEmail> {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
             child: Text(
-              "Didn't receive a email? Check your spam filter or",
+              "Didn't receive an email? Check your spam filter or",
               style: TextStyle(fontSize: 17),
             ),
           ),
           TextButton(
-            onPressed: () {},
+            onPressed: () async {
+              if (user != null && !user!.emailVerified) {
+                try {
+                  await user!.sendEmailVerification();
+                  log('A verification email has been sent to ${user!.email}.');
+                } catch (e) {
+                  log('An error occurred while sending the verification email: $e');
+                }
+              }
+            },
             child: const Text(
               "click to resend",
               style: TextStyle(color: Color(0xFF26005f), fontSize: 17),
