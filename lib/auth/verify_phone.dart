@@ -1,9 +1,9 @@
 import 'dart:developer';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:sports_app/auth/verify_email.dart';
+import 'package:sports_app/widgets/widgets.dart';
 
 class VerifyPhone extends StatefulWidget {
   final String verificationId;
@@ -22,8 +22,6 @@ class _VerifyPhoneState extends State<VerifyPhone> {
   String currentText = "";
 
   _verifyOTP() async {
-    String? email = _firebaseAuth.currentUser!.email;
-
     PhoneAuthCredential credential = PhoneAuthProvider.credential(
       verificationId: verificationId,
       smsCode: currentText,
@@ -33,19 +31,21 @@ class _VerifyPhoneState extends State<VerifyPhone> {
           await _firebaseAuth.currentUser!.linkWithCredential(credential);
       await userCredential.user!.updatePhoneNumber(credential);
       await _firebaseAuth.currentUser!.reload();
-      // await _firebaseAuth.currentUser!.linkWithCredential()
       await _firebaseAuth.signInWithCredential(credential).then((value) => {
             if (value.user != null)
               {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const VerifyEmail()))
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const VerifyEmail(),
+                  ),
+                ),
               }
           });
-      log("Updated phone number");
+      user!.sendEmailVerification();
     } catch (e) {
       log(e.toString());
+      dialogBuilder(context, e.toString(), () => null);
     }
   }
 
@@ -138,7 +138,7 @@ class _VerifyPhoneState extends State<VerifyPhone> {
             ),
             TextButton(
               onPressed: () async {
-                _verifyOTP();
+                await _verifyOTP();
               },
               child: Container(
                 height: 70,
@@ -168,7 +168,38 @@ class _VerifyPhoneState extends State<VerifyPhone> {
                   ),
                 ),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    await _firebaseAuth.verifyPhoneNumber(
+                      phoneNumber: user!.phoneNumber,
+                      verificationCompleted:
+                          (PhoneAuthCredential phoneAuthCredential) async {
+                        await _firebaseAuth
+                            .signInWithCredential(phoneAuthCredential);
+                      },
+                      verificationFailed: (FirebaseAuthException error) {
+                        if (error.code == 'invalid-phone-number') {
+                          dialogBuilder(context, "Invalid phone number entered",
+                              () => null);
+                        }
+                      },
+                      codeSent: (verificationId, forceResedningToken) async {
+                        log("Verification ID: $verificationId");
+
+                        if (_firebaseAuth.currentUser != null &&
+                            !_firebaseAuth.currentUser!.emailVerified) {
+                          try {
+                            await _firebaseAuth.currentUser!
+                                .sendEmailVerification();
+                            log('A verification email has been sent to ${_firebaseAuth.currentUser!.email}.');
+                          } catch (e) {
+                            log('An error occurred while sending the verification email: $e');
+                          }
+                        }
+                      },
+                      codeAutoRetrievalTimeout: (String verificationId) {},
+                      timeout: const Duration(seconds: 60),
+                    );
+                  },
                   child: const Text(
                     "Resend",
                     style: TextStyle(color: Color(0xFF26005f), fontSize: 20),

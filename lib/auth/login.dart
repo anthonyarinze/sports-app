@@ -49,7 +49,7 @@ class _LoginState extends State<Login> {
                 ),
                 const SizedBox(height: 40),
                 BuildTextField(
-                  hintText: "Phone number or email",
+                  hintText: "Email",
                   icon: Icons.phone,
                   obscureText: false,
                   textEditingController: emailController,

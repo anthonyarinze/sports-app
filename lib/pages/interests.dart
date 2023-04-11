@@ -26,87 +26,89 @@ class _InterestsState extends State<Interests> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    return Scaffold(
-      body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Column(
-          children: [
-            const Align(
-              alignment: Alignment.topCenter,
-              child: Padding(
-                padding: EdgeInsets.only(left: 20.0, right: 10.0, top: 30.0),
-                child: Text(
-                  "What do you want to follow?",
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+    return SafeArea(
+      child: Scaffold(
+        body: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
+            children: [
+              const Align(
+                alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: EdgeInsets.only(left: 20.0, right: 10.0, top: 30.0),
+                  child: Text(
+                    "What do you want to follow?",
+                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
-            ),
-            const Padding(
-              padding: EdgeInsets.only(left: 20.0, right: 40.0, top: 10.0),
-              child: Text(
-                "Select your areas of interest you'd like to keep up with",
-                style: TextStyle(fontSize: 20, color: Colors.grey),
+              const Padding(
+                padding: EdgeInsets.only(left: 20.0, right: 40.0, top: 10.0),
+                child: Text(
+                  "Select your areas of interest you'd like to keep up with",
+                  style: TextStyle(fontSize: 20, color: Colors.grey),
+                ),
               ),
-            ),
-            const SizedBox(height: 20.0),
-            GridView.count(
-              shrinkWrap: true,
-              crossAxisCount: 2,
-              crossAxisSpacing: 20.0,
-              mainAxisSpacing: 20.0,
-              childAspectRatio: 2.5,
-              padding: const EdgeInsets.all(10.0),
-              children: List.generate(myMap.length, (index) {
-                final topic = myMap.keys.elementAt(index);
-                var isCheckedAtIndex = myMap.values.elementAt(index);
-                return buildInterestWidget(
-                  isChecked: isCheckedAtIndex,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      isCheckedAtIndex = !(isCheckedAtIndex ?? false);
-                      myMap[topic] = isCheckedAtIndex;
-                      log(isCheckedAtIndex.toString());
-                      log(topic);
-                    });
-                  },
-                  topic: topic,
-                );
-              }),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 30.0),
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width / 1.05,
-                height: 56,
-                child: TextButton(
-                  onPressed: () async {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const Master()));
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(
-                      const Color(0xFF26005f),
+              const SizedBox(height: 20.0),
+              GridView.count(
+                shrinkWrap: true,
+                crossAxisCount: 2,
+                crossAxisSpacing: 20.0,
+                mainAxisSpacing: 20.0,
+                childAspectRatio: 2.5,
+                padding: const EdgeInsets.all(10.0),
+                children: List.generate(myMap.length, (index) {
+                  final topic = myMap.keys.elementAt(index);
+                  var isCheckedAtIndex = myMap.values.elementAt(index);
+                  return buildInterestWidget(
+                    isChecked: isCheckedAtIndex,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        isCheckedAtIndex = !(isCheckedAtIndex ?? false);
+                        myMap[topic] = isCheckedAtIndex;
+                        log(isCheckedAtIndex.toString());
+                        log(topic);
+                      });
+                    },
+                    topic: topic,
+                  );
+                }),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 30.0),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width / 1.05,
+                  height: 56,
+                  child: TextButton(
+                    onPressed: () async {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const Master()));
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                        const Color(0xFF26005f),
+                      ),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                      ),
                     ),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
+                    child: const Text(
+                      "Continue",
+                      style: TextStyle(
+                        fontSize: 25,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                  child: const Text(
-                    "Continue",
-                    style: TextStyle(
-                      fontSize: 25,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

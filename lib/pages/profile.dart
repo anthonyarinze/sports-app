@@ -70,7 +70,7 @@ class Profile extends StatelessWidget {
                 BuildProfileListTile(
                   onTap: () {},
                   leadingIcon: const Icon(Icons.interests),
-                  title: "Football, basketball, rigby, motorsports, bandy",
+                  title: "Football, basketball, rugby, motorsports, bandy",
                 ),
               ],
             ),
